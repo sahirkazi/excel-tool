@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Data Entry Tool</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f7fa;
+            --border-color: #d1d5db;
+            --text-color: #333;
+            --error-color: #e53e3e;
+            --success-color: #38a169;
+            --warning-color: #f6ad55;
+            --warning-hover-color: #dd6b20;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+
+        #entry-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .main-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #create-row-btn {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        #create-row-btn:hover {
+            background-color: #357abd;
+        }
+
+        #copy-btn {
+            background-color: var(--success-color);
+            color: #fff;
+        }
+
+        #copy-btn:hover {
+            background-color: #2f855a;
+        }
+        
+        #clear-btn {
+            background-color: var(--warning-color);
+            color: #fff;
+        }
+        
+        #clear-btn:hover {
+            background-color: var(--warning-hover-color);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        thead {
+            background-color: #e2e8f0;
+        }
+
+        th {
+            font-weight: 700;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Structured Data Entry Tool</h1>
+
+        <form id="entry-form">
+            <!-- Field 1: Process -->
+            <div class="form-group">
+                <label for="process">Process</label>
+                <select id="process" name="process">
+                    <option value="">-- Select --</option>
+                    <option value="Seagate_CMS">Seagate_CMS</option>
+                    <option value="Seagate_Support">Seagate_Support</option>
+                    <option value="Seagate_Support_UM">Seagate_Support_UM</option>
+                    <option value="Sales_Enablement_Brand_Portal_Support">Sales_Enablement_Brand_Portal_Support</option>
+                </select>
+            </div>
+
+            <!-- Field 2: Workfront Ticket No. -->
+            <div class="form-group">
+                <label for="workfront-ticket">Workfront Ticket No.</label>
+                <input type="text" id="workfront-ticket" name="workfront-ticket">
+            </div>
+
+            <!-- Field 3: Type -->
+            <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" name="type">
+                    <option value="">-- Select --</option>
+                    <option value="Product Launch">Product Launch</option>
+                    <option value="Project Campaign">Project Campaign</option>
+                </select>
+            </div>
+
+            <!-- Field 4: Activity -->
+            <div class="form-group">
+                <label for="activity">Activity</label>
+                <select id="activity" name="activity">
+                    <option value="">-- Select --</option>
+                    <option value="Adhoc request">Adhoc request</option>
+                    <option value="Article Page">Article Page</option>
+                    <option value="Solution Page">Solution Page</option>
+                    <option value="Innovation Page">Innovation Page</option>
+                    <option value="Press Release">Press Release</option>
+                </select>
+            </div>
+
+            <!-- Field 5: Project / Product Launch Name -->
+            <div class="form-group">
+                <label for="project-name">Project / Product Launch Name</label>
+                <input type="text" id="project-name" name="project-name">
+            </div>
+
+            <!-- Field 6: Number Of Pages -->
+            <div class="form-group">
+                <label for="num-pages">Number Of Pages</label>
+                <input type="text" id="num-pages" name="num-pages">
+            </div>
+
+            <!-- Field 7: Developer -->
+            <div class="form-group">
+                <label for="developer">Developer</label>
+                <select id="developer" name="developer">
+                    <option value="">-- Select --</option>
+                    <option value="Sahir">Sahir</option>
+                    <option value="Omkar">Omkar</option>
+                    <option value="Shrija">Shrija</option>
+                    <option value="Shailesh">Shailesh</option>
+                    <option value="Zaryab">Zaryab</option>
+                    <option value="Prachi">Prachi</option>
+                    <option value="Mayank">Mayank</option>
+                    <option value="Harsh">Harsh</option>
+                </select>
+            </div>
+
+            <!-- Field 8: Auditor -->
+            <div class="form-group">
+                <label for="auditor">Auditor</label>
+                <select id="auditor" name="auditor">
+                    <option value="">-- Select --</option>
+                    <option value="Sahir">Sahir</option>
+                    <option value="Omkar">Omkar</option>
+                    <option value="Shrija">Shrija</option>
+                    <option value="Shailesh">Shailesh</option>
+                    <option value="Zaryab">Zaryab</option>
+                    <option value="Prachi">Prachi</option>
+                    <option value="Mayank">Mayank</option>
+                    <option value="Harsh">Harsh</option>
+                </select>
+            </div>
+
+            <!-- Field 9: Time for Development -->
+            <div class="form-group">
+                <label for="dev-time">Time for Development</label>
+                <input type="text" id="dev-time" name="dev-time">
+            </div>
+
+            <!-- Field 10: Development Status -->
+            <div class="form-group">
+                <label for="dev-status">Development Status</label>
+                <select id="dev-status" name="dev-status">
+                    <option value="">-- Select --</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Need Info">Need Info</option>
+                    <option value="Need Production Audit">Need Production Audit</option>
+                    <option value="Need Live Audit">Need Live Audit</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Worked on translations">Worked on translations</option>
+                    <option value="Published">Published</option>
+                    <option value="Need Internal Locales QA on edit">Need Internal Locales QA on edit</option>
+                </select>
+            </div>
+            
+            <!-- Field 11: Comment -->
+            <div class="form-group">
+                <label for="comment">Comment if Dev. hours > AHT (Optional)</label>
+                <input type="text" id="comment" name="comment">
+            </div>
+
+            <!-- Field 12: Time for Pre Audit -->
+            <div class="form-group">
+                <label for="pre-audit-time">Time for Pre Audit</label>
+                <input type="text" id="pre-audit-time" name="pre-audit-time">
+            </div>
+
+            <!-- Field 13: Pre Audit Status -->
+            <div class="form-group">
+                <label for="pre-audit-status">Pre Audit Status</label>
+                <select id="pre-audit-status" name="pre-audit-status">
+                    <option value="">-- Select --</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+
+            <!-- Field 14: Time for Post Audit -->
+            <div class="form-group">
+                <label for="post-audit-time">Time for Post Audit</label>
+                <input type="text" id="post-audit-time" name="post-audit-time">
+            </div>
+
+            <!-- Field 15: Post Audit Status -->
+            <div class="form-group">
+                <label for="post-audit-status">Post Audit Status</label>
+                <select id="post-audit-status" name="post-audit-status">
+                    <option value="">-- Select --</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+
+            <!-- Field 16: Client Sustaining Hours -->
+            <div class="form-group">
+                <label for="client-hours">Client Sustaining Hours</label>
+                <input type="text" id="client-hours" name="client-hours">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" id="create-row-btn">Create Row</button>
+            </div>
+        </form>
+
+        <div class="main-controls">
+            <button id="copy-btn" class="hidden">Copy All Rows to Excel</button>
+            <button id="clear-btn" class="hidden">Clear All Data</button>
+        </div>
+
+        <div class="table-container">
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>Process</th>
+                        <th>Workfront Ticket No.</th>
+                        <th>Type</th>
+                        <th>Activity</th>
+                        <th>Project / Product Launch Name</th>
+                        <th>Number Of Pages</th>
+                        <th>Developer</th>
+                        <th>Auditor</th>
+                        <th>Time for Development</th>
+                        <th>Development Status</th>
+                        <th>Comment if Dev. hours are greater than AHT</th>
+                        <th>Time for Pre Audit</th>
+                        <th>Pre Audit Status</th>
+                        <th>Time for Post Audit</th>
+                        <th>Post Audit Status</th>
+                        <th>Client Sustaining Hours</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <!-- Rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded before running the script
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- DOM Element References ---
+            const form = document.getElementById('entry-form');
+            const copyBtn = document.getElementById('copy-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const tableBody = document.getElementById('data-table-body');
+            const table = document.getElementById('data-table');
+
+            // --- Form Input References ---
+            const processInput = document.getElementById('process');
+            const workfrontTicketInput = document.getElementById('workfront-ticket');
+            const typeInput = document.getElementById('type');
+            const activityInput = document.getElementById('activity');
+            const projectNameInput = document.getElementById('project-name');
+            const numPagesInput = document.getElementById('num-pages');
+            const developerInput = document.getElementById('developer');
+            const auditorInput = document.getElementById('auditor');
+            const devTimeInput = document.getElementById('dev-time');
+            const devStatusInput = document.getElementById('dev-status');
+            const commentInput = document.getElementById('comment');
+            const preAuditTimeInput = document.getElementById('pre-audit-time');
+            const preAuditStatusInput = document.getElementById('pre-audit-status');
+            const postAuditTimeInput = document.getElementById('post-audit-time');
+            const postAuditStatusInput = document.getElementById('post-audit-status');
+            const clientHoursInput = document.getElementById('client-hours');
+            
+            // A regular expression to validate numeric input
+            const numericOnlyRegex = /^[0-9]+$/;
+
+            /**
+             * Saves the current data from the table body to localStorage.
+             */
+            const saveTableData = () => {
+                const tableRows = tableBody.querySelectorAll('tr');
+                const data = [];
+                tableRows.forEach(row => {
+                    const rowData = [];
+                    row.querySelectorAll('td').forEach(cell => {
+                        rowData.push(cell.textContent);
+                    });
+                    data.push(rowData);
+                });
+                localStorage.setItem('worklogTableData', JSON.stringify(data));
+            };
+
+            /**
+             * Loads and renders table data from localStorage on page load.
+             */
+            const loadTableData = () => {
+                const dataJSON = localStorage.getItem('worklogTableData');
+                if (dataJSON) {
+                    const data = JSON.parse(dataJSON);
+                    if (data.length > 0) {
+                        data.forEach(rowData => {
+                            const newRow = tableBody.insertRow();
+                            rowData.forEach(cellData => {
+                                const cell = newRow.insertCell();
+                                cell.textContent = cellData;
+                            });
+                        });
+                        copyBtn.classList.remove('hidden');
+                        clearBtn.classList.remove('hidden');
+                    }
+                }
+            };
+            
+            /**
+             * Handles the form submission event.
+             * Validates inputs, creates a new table row, saves data, and resets the form.
+             * @param {Event} event - The form submission event.
+             */
+            const handleFormSubmit = (event) => {
+                event.preventDefault(); // Prevent the default browser form submission
+
+                // --- 1. VALIDATION ---
+                const mandatoryInputs = [
+                    processInput, workfrontTicketInput, typeInput,
+                    activityInput, projectNameInput
+                ];
+
+                for (const input of mandatoryInputs) {
+                    if (!input.value.trim()) {
+                        alert(`Error: Field "${input.previousElementSibling.textContent}" cannot be empty.`);
+                        input.focus();
+                        return;
+                    }
+                }
+                
+                if (workfrontTicketInput.value && !numericOnlyRegex.test(workfrontTicketInput.value.trim())) {
+                    alert('Error: "Workfront Ticket No." must contain only numbers.');
+                    workfrontTicketInput.focus();
+                    return;
+                }
+                
+                if (numPagesInput.value && !numericOnlyRegex.test(numPagesInput.value.trim())) {
+                    alert('Error: "Number Of Pages" must contain only numbers.');
+                    numPagesInput.focus();
+                    return;
+                }
+
+                const developerSelected = developerInput.value.trim() !== '';
+                const auditorSelected = auditorInput.value.trim() !== '';
+                if (developerSelected && auditorSelected) {
+                    alert('Error: You cannot select both a Developer and an Auditor. Please select only one.');
+                    developerInput.focus();
+                    return;
+                }
+                if (!developerSelected && !auditorSelected) {
+                    alert('Error: You must select either a Developer or an Auditor.');
+                    developerInput.focus();
+                    return;
+                }
+
+                // --- 2. CREATE TABLE ROW ---
+                const newRow = tableBody.insertRow();
+                const rowData = [
+                    processInput.value, workfrontTicketInput.value, typeInput.value,
+                    activityInput.value, projectNameInput.value, numPagesInput.value,
+                    developerInput.value, auditorInput.value, devTimeInput.value,
+                    devStatusInput.value, commentInput.value, preAuditTimeInput.value,
+                    preAuditStatusInput.value, postAuditTimeInput.value,
+                    postAuditStatusInput.value, clientHoursInput.value
+                ];
+                
+                rowData.forEach(data => {
+                    const cell = newRow.insertCell();
+                    cell.textContent = data;
+                });
+
+                // --- 3. PERSISTENCE & UI/UX UPDATES ---
+                saveTableData();
+                copyBtn.classList.remove('hidden');
+                clearBtn.classList.remove('hidden');
+                resetForm();
+            };
+
+            /**
+             * Clears all form inputs, resets dropdowns, and focuses on the first field.
+             */
+            const resetForm = () => {
+                form.reset();
+                processInput.focus();
+            };
+
+            /**
+             * Copies the table body data to the clipboard in TSV format.
+             */
+            const handleCopyToClipboard = () => {
+                const rows = [...table.querySelectorAll('tbody tr')].map(row => {
+                    return [...row.querySelectorAll('td')].map(td => td.textContent.trim()).join('\t');
+                });
+                
+                const tsvContent = rows.join('\n');
+                if (!tsvContent) return;
+
+                navigator.clipboard.writeText(tsvContent).then(() => {
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = 'Copied!';
+                    copyBtn.style.backgroundColor = '#2f855a';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                        copyBtn.style.backgroundColor = '';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy to clipboard:', err);
+                    alert('Error: Could not copy data to clipboard.');
+                });
+            };
+
+            /**
+             * Clears the UI, table, and localStorage data after user confirmation.
+             */
+            const handleClearData = () => {
+                if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                    localStorage.removeItem('worklogTableData');
+                    tableBody.innerHTML = '';
+                    copyBtn.classList.add('hidden');
+                    clearBtn.classList.add('hidden');
+                }
+            };
+
+            // --- Event Listeners ---
+            form.addEventListener('submit', handleFormSubmit);
+            copyBtn.addEventListener('click', handleCopyToClipboard);
+            clearBtn.addEventListener('click', handleClearData);
+
+            // --- Initial Load ---
+            loadTableData();
+        });
+    </script>
+</body>
+</html>
