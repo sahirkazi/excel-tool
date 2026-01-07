@@ -63,6 +63,7 @@
         }
 
         input[type="text"],
+        input[type="time"],
         select {
             width: 100%;
             padding: 0.75rem;
@@ -73,6 +74,7 @@
         }
 
         input[type="text"]:focus,
+        input[type="time"]:focus,
         select:focus {
             outline: none;
             border-color: var(--primary-color);
@@ -101,7 +103,13 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-
+        
+        button.edit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+        }
+        
         #create-row-btn {
             background-color: var(--primary-color);
             color: #fff;
@@ -120,12 +128,12 @@
             background-color: #2f855a;
         }
         
-        #clear-btn {
+        #clear-btn, #cancel-edit-btn {
             background-color: var(--warning-color);
             color: #fff;
         }
         
-        #clear-btn:hover {
+        #clear-btn:hover, #cancel-edit-btn:hover {
             background-color: var(--warning-hover-color);
         }
 
@@ -149,6 +157,10 @@
             text-align: left;
             border: 1px solid var(--border-color);
         }
+        
+        td:last-child {
+            text-align: center;
+        }
 
         thead {
             background-color: #e2e8f0;
@@ -168,8 +180,7 @@
     <div class="container">
         <h1>Structured Data Entry Tool</h1>
 
-        <form id="entry-form">
-            <!-- Field 1: Process -->
+        <form id="entry-form" data-editing-index="-1">
             <div class="form-group">
                 <label for="process">Process</label>
                 <select id="process" name="process">
@@ -180,14 +191,10 @@
                     <option value="Sales_Enablement_Brand_Portal_Support">Sales_Enablement_Brand_Portal_Support</option>
                 </select>
             </div>
-
-            <!-- Field 2: Workfront Ticket No. -->
             <div class="form-group">
                 <label for="workfront-ticket">Workfront Ticket No.</label>
                 <input type="text" id="workfront-ticket" name="workfront-ticket">
             </div>
-
-            <!-- Field 3: Type -->
             <div class="form-group">
                 <label for="type">Type</label>
                 <select id="type" name="type">
@@ -196,8 +203,6 @@
                     <option value="Project Campaign">Project Campaign</option>
                 </select>
             </div>
-
-            <!-- Field 4: Activity -->
             <div class="form-group">
                 <label for="activity">Activity</label>
                 <select id="activity" name="activity">
@@ -209,20 +214,14 @@
                     <option value="Press Release">Press Release</option>
                 </select>
             </div>
-
-            <!-- Field 5: Project / Product Launch Name -->
             <div class="form-group">
                 <label for="project-name">Project / Product Launch Name</label>
                 <input type="text" id="project-name" name="project-name">
             </div>
-
-            <!-- Field 6: Number Of Pages -->
             <div class="form-group">
                 <label for="num-pages">Number Of Pages</label>
                 <input type="text" id="num-pages" name="num-pages">
             </div>
-
-            <!-- Field 7: Developer -->
             <div class="form-group">
                 <label for="developer">Developer</label>
                 <select id="developer" name="developer">
@@ -237,8 +236,6 @@
                     <option value="Harsh">Harsh</option>
                 </select>
             </div>
-
-            <!-- Field 8: Auditor -->
             <div class="form-group">
                 <label for="auditor">Auditor</label>
                 <select id="auditor" name="auditor">
@@ -253,14 +250,10 @@
                     <option value="Harsh">Harsh</option>
                 </select>
             </div>
-
-            <!-- Field 9: Time for Development -->
             <div class="form-group">
                 <label for="dev-time">Time for Development</label>
-                <input type="text" id="dev-time" name="dev-time">
+                <input type="time" id="dev-time" name="dev-time" step="1">
             </div>
-
-            <!-- Field 10: Development Status -->
             <div class="form-group">
                 <label for="dev-status">Development Status</label>
                 <select id="dev-status" name="dev-status">
@@ -275,20 +268,14 @@
                     <option value="Need Internal Locales QA on edit">Need Internal Locales QA on edit</option>
                 </select>
             </div>
-            
-            <!-- Field 11: Comment -->
             <div class="form-group">
                 <label for="comment">Comment if Dev. hours > AHT (Optional)</label>
                 <input type="text" id="comment" name="comment">
             </div>
-
-            <!-- Field 12: Time for Pre Audit -->
             <div class="form-group">
                 <label for="pre-audit-time">Time for Pre Audit</label>
-                <input type="text" id="pre-audit-time" name="pre-audit-time">
+                <input type="time" id="pre-audit-time" name="pre-audit-time" step="1">
             </div>
-
-            <!-- Field 13: Pre Audit Status -->
             <div class="form-group">
                 <label for="pre-audit-status">Pre Audit Status</label>
                 <select id="pre-audit-status" name="pre-audit-status">
@@ -297,14 +284,10 @@
                     <option value="Rejected">Rejected</option>
                 </select>
             </div>
-
-            <!-- Field 14: Time for Post Audit -->
             <div class="form-group">
                 <label for="post-audit-time">Time for Post Audit</label>
-                <input type="text" id="post-audit-time" name="post-audit-time">
+                <input type="time" id="post-audit-time" name="post-audit-time" step="1">
             </div>
-
-            <!-- Field 15: Post Audit Status -->
             <div class="form-group">
                 <label for="post-audit-status">Post Audit Status</label>
                 <select id="post-audit-status" name="post-audit-status">
@@ -313,15 +296,14 @@
                     <option value="Rejected">Rejected</option>
                 </select>
             </div>
-
-            <!-- Field 16: Client Sustaining Hours -->
             <div class="form-group">
                 <label for="client-hours">Client Sustaining Hours</label>
-                <input type="text" id="client-hours" name="client-hours">
+                <input type="time" id="client-hours" name="client-hours" step="1">
             </div>
 
             <div class="form-actions">
                 <button type="submit" id="create-row-btn">Create Row</button>
+                <button type="button" id="cancel-edit-btn" class="hidden">Cancel Edit</button>
             </div>
         </form>
 
@@ -350,6 +332,7 @@
                         <th>Time for Post Audit</th>
                         <th>Post Audit Status</th>
                         <th>Client Sustaining Hours</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="data-table-body">
@@ -360,180 +343,179 @@
     </div>
 
     <script>
-        // Wait for the DOM to be fully loaded before running the script
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- DOM Element References ---
             const form = document.getElementById('entry-form');
+            const createRowBtn = document.getElementById('create-row-btn');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
             const copyBtn = document.getElementById('copy-btn');
             const clearBtn = document.getElementById('clear-btn');
             const tableBody = document.getElementById('data-table-body');
-            const table = document.getElementById('data-table');
 
-            // --- Form Input References ---
-            const processInput = document.getElementById('process');
-            const workfrontTicketInput = document.getElementById('workfront-ticket');
-            const typeInput = document.getElementById('type');
-            const activityInput = document.getElementById('activity');
-            const projectNameInput = document.getElementById('project-name');
-            const numPagesInput = document.getElementById('num-pages');
-            const developerInput = document.getElementById('developer');
-            const auditorInput = document.getElementById('auditor');
-            const devTimeInput = document.getElementById('dev-time');
-            const devStatusInput = document.getElementById('dev-status');
-            const commentInput = document.getElementById('comment');
-            const preAuditTimeInput = document.getElementById('pre-audit-time');
-            const preAuditStatusInput = document.getElementById('pre-audit-status');
-            const postAuditTimeInput = document.getElementById('post-audit-time');
-            const postAuditStatusInput = document.getElementById('post-audit-status');
-            const clientHoursInput = document.getElementById('client-hours');
+            const allInputs = Array.from(document.querySelectorAll('#entry-form select, #entry-form input'));
             
-            // A regular expression to validate numeric input
-            const numericOnlyRegex = /^[0-9]+$/;
-
-            /**
-             * Saves the current data from the table body to localStorage.
-             */
             const saveTableData = () => {
-                const tableRows = tableBody.querySelectorAll('tr');
-                const data = [];
-                tableRows.forEach(row => {
-                    const rowData = [];
-                    row.querySelectorAll('td').forEach(cell => {
-                        rowData.push(cell.textContent);
-                    });
-                    data.push(rowData);
-                });
+                const data = Array.from(tableBody.rows).map(row => 
+                    Array.from(row.cells).slice(0, -1).map(cell => cell.textContent)
+                );
                 localStorage.setItem('worklogTableData', JSON.stringify(data));
             };
 
-            /**
-             * Loads and renders table data from localStorage on page load.
-             */
+            const renderRow = (rowData) => {
+                const newRow = tableBody.insertRow();
+                rowData.forEach(cellData => {
+                    const cell = newRow.insertCell();
+                    cell.textContent = cellData;
+                });
+                addActionsCell(newRow);
+            };
+
+            const addActionsCell = (row) => {
+                const actionsCell = row.insertCell();
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.className = 'edit-btn';
+                editButton.addEventListener('click', () => startEditMode(row));
+                actionsCell.appendChild(editButton);
+            };
+
             const loadTableData = () => {
                 const dataJSON = localStorage.getItem('worklogTableData');
-                if (dataJSON) {
-                    const data = JSON.parse(dataJSON);
-                    if (data.length > 0) {
-                        data.forEach(rowData => {
-                            const newRow = tableBody.insertRow();
-                            rowData.forEach(cellData => {
-                                const cell = newRow.insertCell();
-                                cell.textContent = cellData;
-                            });
-                        });
-                        copyBtn.classList.remove('hidden');
-                        clearBtn.classList.remove('hidden');
-                    }
+                if (!dataJSON) return;
+                
+                const data = JSON.parse(dataJSON);
+                if (data.length > 0) {
+                    data.forEach(renderRow);
+                    copyBtn.classList.remove('hidden');
+                    clearBtn.classList.remove('hidden');
                 }
             };
-            
-            /**
-             * Handles the form submission event.
-             * Validates inputs, creates a new table row, saves data, and resets the form.
-             * @param {Event} event - The form submission event.
-             */
-            const handleFormSubmit = (event) => {
-                event.preventDefault(); // Prevent the default browser form submission
 
-                // --- 1. VALIDATION ---
-                const mandatoryInputs = [
-                    processInput, workfrontTicketInput, typeInput,
-                    activityInput, projectNameInput
-                ];
+            const startEditMode = (row) => {
+                const cells = Array.from(row.cells).slice(0, -1);
+                allInputs.forEach((input, index) => {
+                    input.value = cells[index].textContent;
+                });
+                
+                form.dataset.editingIndex = row.rowIndex - 1;
+                createRowBtn.textContent = 'Update Row';
+                cancelEditBtn.classList.remove('hidden');
+                window.scrollTo(0, 0);
+            };
 
-                for (const input of mandatoryInputs) {
+            const exitEditMode = () => {
+                form.reset();
+                form.dataset.editingIndex = '-1';
+                createRowBtn.textContent = 'Create Row';
+                cancelEditBtn.classList.add('hidden');
+                allInputs[0].focus();
+            };
+
+            const validateInputs = () => {
+                const numericOnlyRegex = /^[0-9]*$/;
+                const timeFormatRegex = /^\d+:[0-5]\d:[0-5]\d$/;
+
+                const validateTimeField = (id, fieldName) => {
+                    const input = document.getElementById(id);
+                    const value = input.value.trim();
+                    if (value && !timeFormatRegex.test(value)) {
+                        alert(`Error: "${fieldName}" must be in H:MM:SS format (e.g., 1:30:00 or 120:00:00).`);
+                        input.focus();
+                        return false;
+                    }
+                    return true;
+                };
+
+                const mandatoryFields = ['process', 'workfront-ticket', 'type', 'activity', 'project-name'];
+                for (const id of mandatoryFields) {
+                    const input = document.getElementById(id);
                     if (!input.value.trim()) {
                         alert(`Error: Field "${input.previousElementSibling.textContent}" cannot be empty.`);
                         input.focus();
-                        return;
+                        return false;
                     }
                 }
-                
-                if (workfrontTicketInput.value && !numericOnlyRegex.test(workfrontTicketInput.value.trim())) {
-                    alert('Error: "Workfront Ticket No." must contain only numbers.');
-                    workfrontTicketInput.focus();
-                    return;
-                }
-                
-                if (numPagesInput.value && !numericOnlyRegex.test(numPagesInput.value.trim())) {
-                    alert('Error: "Number Of Pages" must contain only numbers.');
-                    numPagesInput.focus();
-                    return;
-                }
 
-                const developerSelected = developerInput.value.trim() !== '';
-                const auditorSelected = auditorInput.value.trim() !== '';
+                const workfrontTicket = document.getElementById('workfront-ticket').value;
+                if (workfrontTicket && !numericOnlyRegex.test(workfrontTicket)) {
+                    alert('Error: "Workfront Ticket No." must contain only numbers.');
+                    return false;
+                }
+                
+                const numPages = document.getElementById('num-pages').value;
+                if (numPages && !numericOnlyRegex.test(numPages)) {
+                    alert('Error: "Number Of Pages" must contain only numbers.');
+                    return false;
+                }
+                
+                // There is no specific custom validation for time fields with type="time"
+                // as the browser's native picker ensures correct format.
+                // Custom validation kept only for text fields that expect time format.
+                // However, now "post-audit-time" will also be type="time", so this specific validation will be removed.
+
+                const developerSelected = document.getElementById('developer').value.trim() !== '';
+                const auditorSelected = document.getElementById('auditor').value.trim() !== '';
                 if (developerSelected && auditorSelected) {
-                    alert('Error: You cannot select both a Developer and an Auditor. Please select only one.');
-                    developerInput.focus();
-                    return;
+                    alert('Error: You cannot select both a Developer and an Auditor.');
+                    return false;
                 }
                 if (!developerSelected && !auditorSelected) {
                     alert('Error: You must select either a Developer or an Auditor.');
-                    developerInput.focus();
-                    return;
+                    return false;
                 }
 
-                // --- 2. CREATE TABLE ROW ---
-                const newRow = tableBody.insertRow();
-                const rowData = [
-                    processInput.value, workfrontTicketInput.value, typeInput.value,
-                    activityInput.value, projectNameInput.value, numPagesInput.value,
-                    developerInput.value, auditorInput.value, devTimeInput.value,
-                    devStatusInput.value, commentInput.value, preAuditTimeInput.value,
-                    preAuditStatusInput.value, postAuditTimeInput.value,
-                    postAuditStatusInput.value, clientHoursInput.value
-                ];
+                return true;
+            };
+
+            const handleFormSubmit = (event) => {
+                event.preventDefault();
+                if (!validateInputs()) return;
+
+                const editingIndex = form.dataset.editingIndex;
                 
-                rowData.forEach(data => {
-                    const cell = newRow.insertCell();
-                    cell.textContent = data;
+                const rowData = allInputs.map(input => {
+                    if (input.type === 'time' && input.valueAsDate) {
+                        const date = input.valueAsDate;
+                        const hours = date.getHours().toString().padStart(2, '0');
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        const seconds = date.getSeconds().toString().padStart(2, '0');
+                        return `${hours}:${minutes}:${seconds}`;
+                    }
+                    return input.value;
                 });
 
-                // --- 3. PERSISTENCE & UI/UX UPDATES ---
+                if (editingIndex === '-1') {
+                    renderRow(rowData);
+                } else {
+                    const row = tableBody.rows[editingIndex];
+                    Array.from(row.cells).slice(0, -1).forEach((cell, index) => {
+                        cell.textContent = rowData[index];
+                    });
+                    exitEditMode();
+                }
+
                 saveTableData();
                 copyBtn.classList.remove('hidden');
                 clearBtn.classList.remove('hidden');
-                resetForm();
+                if (editingIndex === '-1') {
+                    form.reset();
+                    allInputs[0].focus();
+                }
             };
 
-            /**
-             * Clears all form inputs, resets dropdowns, and focuses on the first field.
-             */
-            const resetForm = () => {
-                form.reset();
-                processInput.focus();
-            };
-
-            /**
-             * Copies the table body data to the clipboard in TSV format.
-             */
             const handleCopyToClipboard = () => {
-                const rows = [...table.querySelectorAll('tbody tr')].map(row => {
-                    return [...row.querySelectorAll('td')].map(td => td.textContent.trim()).join('\t');
-                });
+                const tsvContent = Array.from(tableBody.rows)
+                    .map(row => Array.from(row.cells).slice(0, -1).map(cell => cell.textContent.trim()).join('\t'))
+                    .join('\n');
                 
-                const tsvContent = rows.join('\n');
                 if (!tsvContent) return;
 
                 navigator.clipboard.writeText(tsvContent).then(() => {
-                    const originalText = copyBtn.textContent;
                     copyBtn.textContent = 'Copied!';
-                    copyBtn.style.backgroundColor = '#2f855a';
-                    setTimeout(() => {
-                        copyBtn.textContent = originalText;
-                        copyBtn.style.backgroundColor = '';
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Failed to copy to clipboard:', err);
-                    alert('Error: Could not copy data to clipboard.');
+                    setTimeout(() => { copyBtn.textContent = 'Copy All Rows to Excel'; }, 2000);
                 });
             };
 
-            /**
-             * Clears the UI, table, and localStorage data after user confirmation.
-             */
             const handleClearData = () => {
                 if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
                     localStorage.removeItem('worklogTableData');
@@ -543,12 +525,11 @@
                 }
             };
 
-            // --- Event Listeners ---
             form.addEventListener('submit', handleFormSubmit);
             copyBtn.addEventListener('click', handleCopyToClipboard);
             clearBtn.addEventListener('click', handleClearData);
+            cancelEditBtn.addEventListener('click', exitEditMode);
 
-            // --- Initial Load ---
             loadTableData();
         });
     </script>
